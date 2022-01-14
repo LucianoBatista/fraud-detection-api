@@ -3,7 +3,7 @@ import os
 
 class BaseConfig:
     TESTING = False
-    SQLALCHEMY_TRACK_NOTIFICATIONS = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = "my_precious"
 
 

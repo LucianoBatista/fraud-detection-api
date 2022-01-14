@@ -18,8 +18,10 @@ def create_app(script_info=None):
 
     # register flask blueprints
     from src.api.ping import ping_blueprint
+    from src.api.ml_model import ml_model_blueprint
 
     app.register_blueprint(ping_blueprint)
+    app.register_blueprint(ml_model_blueprint)
 
     # shell context for flask cli
     # allow us to investigate some things with db and the app
