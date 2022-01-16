@@ -2,6 +2,7 @@ from asyncio import create_task
 import os
 
 from flask import Flask
+import flask_restx
 from flask_sqlalchemy import SQLAlchemy
 from celery import Celery
 
@@ -21,12 +22,10 @@ def create_app(script_info=None):
     # db init
     db.init_app(app)
 
-    # register flask blueprints
-    from src.api.status import ping_blueprint
-    from src.api.ml_model import ml_model_blueprint
+    # register api
+    from src.api import api
 
-    app.register_blueprint(ping_blueprint, url_prefix="/api/v1")
-    app.register_blueprint(ml_model_blueprint, url_prefix="/api/v1/model")
+    api.init_app(app)
 
     # shell context for flask cli
     # allow us to investigate some things with db and the app
