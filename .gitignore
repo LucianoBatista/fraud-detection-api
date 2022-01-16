@@ -3,3 +3,4 @@ env
 .vscode
 .coverage
 notes.md
+data/**.csv
