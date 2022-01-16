@@ -1,8 +1,5 @@
-from random import sample
-from threading import local
 import pandas as pd
 from pandas import DataFrame, Series
-from sklearn import datasets
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, roc_auc_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split

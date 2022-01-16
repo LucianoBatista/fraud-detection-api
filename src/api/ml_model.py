@@ -8,8 +8,6 @@ predict_blueprint = Blueprint("predict", __name__)
 metrics_blueprint = Blueprint("metrics", __name__)
 
 api = Api(ml_model_blueprint)
-# api = Api(predict_blueprint)
-# api = Api(metrics_blueprint)
 
 
 class MlModel(Resource):
@@ -24,18 +22,6 @@ class MlModel(Resource):
         task = async_workflow.delay(str(url))
         print(task)
         return {"task_id": task.id}, 202
-
-
-class Predict(Resource):
-    """Realize the predict of the passed data"""
-
-    ...
-
-
-class CheckHealthy(Resource):
-    """Check metrics of the actual model"""
-
-    ...
 
 
 api.add_resource(MlModel, "/training")
