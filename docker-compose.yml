@@ -16,6 +16,8 @@ services:
       - APP_SETTINGS=src.config.DevelopmentConfig
       - DATABASE_URL=postgresql://postgres:postgres@api-db:5432/api_dev
       - DATABASE_TEST_URL=postgresql://postgres:postgres@api-db:5432/api_test
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on: 
       - api-db 
     
@@ -28,3 +30,28 @@ services:
     environment: 
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    
+  worker: 
+    build: .
+    command: celery -A src.celery worker --loglevel=info
+    volumes: 
+      - .:/usr/src/app 
+    environment:
+      - FLASK_ENV=development
+      - APP_SETTINGS=src.config.DevelopmentConfig
+      - DATABASE_URL=postgresql://postgres:postgres@api-db:5432/api_dev
+      - DATABASE_TEST_URL=postgresql://postgres:postgres@api-db:5432/api_test
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - api
+      - api-db
+      - redis
+
+  redis: 
+    image: redis:6-alpine
+    restart: always
+    expose:
+      - 6379
+    ports:
+      - 6379:6379

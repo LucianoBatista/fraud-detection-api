@@ -1,7 +1,11 @@
+from asyncio import create_task
 import os
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from celery import Celery
+
+from src.celery_worker import make_celery
 
 # instantiate the db
 db = SQLAlchemy()
@@ -14,6 +18,7 @@ def create_app(script_info=None):
     app.config.from_object(app_settings)
     app.config["RESTX_ERROR_404_HELP"] = False  # do not change some outputs
 
+    # db init
     db.init_app(app)
 
     # register flask blueprints
@@ -30,3 +35,7 @@ def create_app(script_info=None):
         return {"app": app, "db": db}
 
     return app
+
+
+# creating an instance of the app with celery
+celery = make_celery(create_app())
