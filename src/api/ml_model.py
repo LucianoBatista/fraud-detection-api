@@ -4,7 +4,7 @@ from flask_restx import Api, Resource, Namespace, fields
 
 from src.celery.tasks import async_workflow
 
-ml_model_namespace = Namespace("training")
+ml_model_namespace = Namespace("Training")
 
 ml_model_schema = ml_model_namespace.model(
     "ML-Model", {"url": fields.String(required=True)}
@@ -28,7 +28,7 @@ class MlModelStatus(Resource):
 
     def get(self, model_id: int):
         print(model_id)
-        return {"accuracy": 0.987, "auc": 0.877, "recall": 0.766}
+        return {"status": "processed", "time": 250}
 
 
 ml_model_namespace.add_resource(MlModel, "/training")

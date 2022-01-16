@@ -1,7 +1,7 @@
 from flask_restx import Api, Resource, Namespace
 
 
-ping_namespace = Namespace("status")
+ping_namespace = Namespace("Status")
 
 
 class Ping(Resource):
