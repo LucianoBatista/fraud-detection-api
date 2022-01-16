@@ -1,15 +1,20 @@
 from tokenize import Name
 from flask import Blueprint, jsonify, request
-from flask_restx import Api, Resource, Namespace
+from flask_restx import Api, Resource, Namespace, fields
 
 from src.celery.tasks import async_workflow
 
 ml_model_namespace = Namespace("training")
 
+ml_model_schema = ml_model_namespace.model(
+    "ML-Model", {"url": fields.String(required=True)}
+)
+
 
 class MlModel(Resource):
     """Endpoint related to the training of the model"""
 
+    @ml_model_namespace.expect(ml_model_schema, validate=True)
     def post(self):
         content = request.get_json()
         url = content["url"]
@@ -28,5 +33,3 @@ class MlModelStatus(Resource):
 
 ml_model_namespace.add_resource(MlModel, "/training")
 ml_model_namespace.add_resource(MlModelStatus, "/training/<int:model_id>")
-# api.add_resource(Predict, "/predict")
-# api.add_resource(CheckHealthy, "/metrics")
