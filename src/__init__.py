@@ -1,12 +1,11 @@
-from asyncio import create_task
 import os
 
 from flask import Flask
-import flask_restx
 from flask_sqlalchemy import SQLAlchemy
-from celery import Celery
+from flask_migrate import Migrate
 
 from src.celery_worker import make_celery
+
 
 # instantiate the db
 db = SQLAlchemy()
@@ -21,9 +20,11 @@ def create_app(script_info=None):
 
     # db init
     db.init_app(app)
+    migrate = Migrate(app, db)
 
     # register api
     from src.api import api
+    from src.api import models
 
     api.init_app(app)
 

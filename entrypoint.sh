@@ -8,4 +8,5 @@ done
 
 echo "PostgreSQL started"
 
+flask db upgrade
 python manage.py run -h 0.0.0.0

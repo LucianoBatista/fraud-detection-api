@@ -18,4 +18,4 @@ RUN pip3 install -q --no-cache-dir \
 COPY . .
 COPY ./entrypoint.sh .
 
-RUN chmod +x /usr/src/app/entrypoint.sh
+ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
