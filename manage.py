@@ -3,6 +3,7 @@ from flask.app import Flask
 import sys
 from flask.cli import FlaskGroup
 from src import create_app, db
+from src.api.models import Model, Predict
 
 app = create_app()
 cli = FlaskGroup(create_app=create_app)
@@ -18,7 +19,21 @@ def recreate_db():
 @cli.command("seed_db")
 def seed_db():
     """Will populate our database just for initial test"""
-    ...
+    db.session.add(
+        Model(
+            modelname="lrc_baseline.sav",
+            precision=0.964,
+            recall=0.082,
+            accuracy=0.997,
+            auc=0.541,
+            f1=0.153,
+            time=26.77,
+            enabled=1,
+        )
+    )
+    db.session.commit()
+    db.session.add(Predict(transaction={"amount": 125}, prediction=1, model_id=1))
+    db.session.commit()
 
 
 if __name__ == "__main__":
