@@ -4,13 +4,14 @@ services:
 
   api:
     build:
-      context: . 
+      context: ./ 
       dockerfile: Dockerfile 
     volumes:
       - .:/usr/src/app 
     ports: 
       - 5004:5000
     environment:
+      - APP_NAME=api
       - FLASK_APP=src/__init__.py
       - FLASK_ENV=development
       - APP_SETTINGS=src.config.DevelopmentConfig
@@ -33,11 +34,12 @@ services:
       - POSTGRES_PASSWORD=postgres
   
   worker: 
-    build: .
-    command: celery -A src.celery worker --loglevel=info
+    build:
+      context: ./
     volumes: 
       - .:/usr/src/app 
     environment:
+      - APP_NAME=worker
       - FLASK_APP=src/__init__.py
       - FLASK_ENV=development
       - APP_SETTINGS=src.config.DevelopmentConfig

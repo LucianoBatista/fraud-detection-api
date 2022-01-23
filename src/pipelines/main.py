@@ -6,7 +6,7 @@ from src.database.crud import model_crud
 import pandas as pd
 
 
-def run_pipeline(download_link: str):
+def run_pipeline(download_link: str, training_queue_id: int):
     # reading downloaded data
     df = pd.read_csv(download_link)
 
@@ -43,7 +43,14 @@ def run_pipeline(download_link: str):
 
         # model to add
         model = {
+            "modelname": f"model_{training_queue_id}",
             "accuracy": metrics.get("accuracy"),
+            "recall": metrics.get("recall"),
+            "precision": metrics.get("precision"),
+            "f1": metrics.get("f1"),
+            "time": 12,
+            "auc": 123,
         }
 
         model_crud.add_new_model(model)
+        # update queued model

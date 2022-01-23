@@ -33,3 +33,11 @@ def add_model(model: Model):
         )
     )
     db.session.commit()
+
+
+def queue_model(dataset: str, status: str):
+    queue_model_obj = TrainingQueue(dataset=dataset, status=status)
+    db.session.add(queue_model_obj)
+    db.session.commit()
+    id = queue_model_obj.id
+    return id
