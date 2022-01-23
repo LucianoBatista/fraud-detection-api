@@ -1,8 +1,8 @@
 """Initial migration.
 
-Revision ID: cddd8655a064
+Revision ID: a6f5ccf1071a
 Revises: 
-Create Date: 2022-01-22 23:07:34.848438
+Create Date: 2022-01-23 00:31:46.451370
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'cddd8655a064'
+revision = 'a6f5ccf1071a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,6 +34,16 @@ def upgrade():
     sa.UniqueConstraint('modelname')
     )
     op.create_index(op.f('ix_model_created_at'), 'model', ['created_at'], unique=False)
+    op.create_table('training_queue',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('dataset', sa.Text(), nullable=False),
+    sa.Column('status', sa.String(length=128), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_training_queue_created_at'), 'training_queue', ['created_at'], unique=False)
+    op.create_index(op.f('ix_training_queue_updated_at'), 'training_queue', ['updated_at'], unique=False)
     op.create_table('predict',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('transaction', sa.JSON(), nullable=False),
@@ -54,6 +64,9 @@ def downgrade():
     op.drop_index(op.f('ix_predict_updated_at'), table_name='predict')
     op.drop_index(op.f('ix_predict_created_at'), table_name='predict')
     op.drop_table('predict')
+    op.drop_index(op.f('ix_training_queue_updated_at'), table_name='training_queue')
+    op.drop_index(op.f('ix_training_queue_created_at'), table_name='training_queue')
+    op.drop_table('training_queue')
     op.drop_index(op.f('ix_model_created_at'), table_name='model')
     op.drop_table('model')
     # ### end Alembic commands ###

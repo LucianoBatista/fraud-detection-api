@@ -9,4 +9,7 @@ done
 echo "PostgreSQL started"
 
 flask db upgrade
+python manage.py seed_model
+python manage.py seed_predict
+python manage.py seed_training
 python manage.py run -h 0.0.0.0

@@ -1,6 +1,4 @@
-from datetime import date, datetime
-from email.policy import default
-from sqlalchemy.sql import func
+from datetime import datetime
 from src import db
 
 
@@ -30,5 +28,20 @@ class Predict(db.Model):
     transaction = db.Column(db.JSON, nullable=False)
     prediction = db.Column(db.Boolean, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now, index=True)
-    updated_at = db.Column(db.DateTime, default=datetime.now, index=True)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.now, onupdate=datetime.now, index=True
+    )
     model_id = db.Column(db.Integer, db.ForeignKey("model.id"), nullable=False)
+
+
+class TrainingQueue(db.Model):
+
+    __tablename__ = "training_queue"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    dataset = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(128), default="pending", nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now, index=True)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.now, onupdate=datetime.now, index=True
+    )

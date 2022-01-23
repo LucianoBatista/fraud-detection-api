@@ -3,7 +3,7 @@ from flask.app import Flask
 import sys
 from flask.cli import FlaskGroup
 from src import create_app, db
-from src.api.models import Model, Predict
+from src.api.models import Model, Predict, TrainingQueue
 
 app = create_app()
 cli = FlaskGroup(create_app=create_app)
@@ -16,7 +16,7 @@ def recreate_db():
     db.session.commit()
 
 
-@cli.command("seed_db")
+@cli.command("seed_model")
 def seed_db():
     """Will populate our database just for initial test"""
     db.session.add(
@@ -32,7 +32,17 @@ def seed_db():
         )
     )
     db.session.commit()
+
+
+@cli.command("seed_predict")
+def seed_predict():
     db.session.add(Predict(transaction={"amount": 125}, prediction=1, model_id=1))
+    db.session.commit()
+
+
+@cli.command("seed_training")
+def seed_trainning():
+    db.session.add(TrainingQueue(dataset="htttp://data.csv"))
     db.session.commit()
 
 
