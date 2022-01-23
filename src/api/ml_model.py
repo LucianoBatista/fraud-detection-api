@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from flask_restx import Api, Resource, Namespace, fields
 
 from src.celery.tasks import async_workflow
+from src.database.crud import model_crud
 
 ml_model_namespace = Namespace("Training")
 
@@ -27,8 +28,8 @@ class MlModelStatus(Resource):
     """Endpoint to collect the information about the training of the model"""
 
     def get(self, model_id: int):
-        print(model_id)
-        return {"status": "processed", "time": 250}
+        obj = model_crud.get_status(model_id)
+        return {"status": obj.status}, 200
 
 
 ml_model_namespace.add_resource(MlModel, "/training")
