@@ -99,7 +99,7 @@ class Training:
         self.y_pred_train = self.lrc.predict(self.X_train)
         self.y_pred_test = self.lrc.predict(self.X_test)
 
-    def calculate_metrics(self):
+    def calculate_metrics(self) -> dict:
         # train
         accuracy_training = (accuracy_score(self.y_train, self.y_pred_train),)
         precision_training = precision_score(self.y_train, self.y_pred_train)
