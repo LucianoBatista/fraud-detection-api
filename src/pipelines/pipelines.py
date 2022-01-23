@@ -1,9 +1,11 @@
+import pickle
 import pandas as pd
 from pandas import DataFrame, Series
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, roc_auc_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
+import numpy as np
 
 
 class PreProcessingPipe:
@@ -128,3 +130,15 @@ class Training:
         }
 
         return metrics_training
+
+
+def prediction(pickle_model, payload: dict):
+    with open(pickle_model, "rb") as f:
+        lr = pickle.load(f)
+
+    print(lr)
+    payload_df = pd.DataFrame(payload, index=[1])
+    payload_array = np.array(payload_df)
+    print(payload_array)
+    y_pred = lr.predict(payload_array)
+    return y_pred

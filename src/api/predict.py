@@ -1,6 +1,7 @@
 from importlib.metadata import requires
 from flask import request
 from flask_restx import Resource, Namespace, fields
+from src.pipelines.pipelines import prediction
 
 predict_namespace = Namespace("Predict")
 
@@ -18,13 +19,20 @@ class Predict(Resource):
     @predict_namespace.expect(predict_schema, validate=True)
     def post(self):
         content = request.get_json()
-        step = content["step"]
-        transaction_type = content["type"]
-        amount = content["amount"]
 
         # do the prediction
-
-        return {"step": step, "type": transaction_type, "amount": amount}
+        payload = {
+            "step": 2,
+            "type": 888,
+            "amount": 2000000,
+            "oldbalanceDest": 58858,
+            "newbalanceDest": 0,
+            "isFlaggedFraud": 0,
+        }
+        pkl_model_path = "src/models/lrc_baseline.sav"
+        y_pred = prediction(pkl_model_path, payload)
+        y_pred_float = float(y_pred)
+        return {"y_pred": y_pred_float}
 
 
 predict_namespace.add_resource(Predict, "/predict")
