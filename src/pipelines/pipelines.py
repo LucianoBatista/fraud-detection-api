@@ -6,6 +6,7 @@ from sklearn.metrics import accuracy_score, roc_auc_score, precision_score, reca
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from feature_engine.encoding import OneHotEncoder
+import numpy as np
 
 
 class PreProcessingPipe:
