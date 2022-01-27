@@ -1,16 +1,18 @@
+import pickle
 import pandas as pd
 from pandas import DataFrame, Series
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, roc_auc_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
+from feature_engine.encoding import OneHotEncoder
 
 
 class PreProcessingPipe:
-    def __init__(self, dataset: DataFrame) -> None:
+    def __init__(self, dataset: DataFrame, X_test: DataFrame = None) -> None:
         self.dataset = dataset
         self.X_train = None
-        self.X_test = None
+        self.X_test = X_test
         self.y_train = None
         self.y_test = None
 
@@ -60,6 +62,21 @@ class PreProcessingPipe:
 
         self.X_train["type"] = le.transform(self.X_train["type"])
         self.X_test["type"] = le.transform(self.X_test["type"])
+
+    def one_hot_encoder(self, cat_variables: list, is_x_test: bool):
+
+        if not is_x_test:
+            ohe = OneHotEncoder(variables=cat_variables)
+
+            ohe.fit(self.X_train)
+            self.X_train = ohe.transform(self.X_train)
+            self.X_test = ohe.transform(self.X_test)
+
+        else:
+            with open("src/models/ohe", "rb") as f:
+                ohe = pickle.load(f)
+
+            self.X_test = ohe.transform(self.X_test)
 
     def scaling(self):
         scaler = preprocessing.MinMaxScaler(feature_range=(0, 1))
