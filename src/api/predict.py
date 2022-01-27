@@ -1,6 +1,7 @@
 from importlib.metadata import requires
 from flask import request
 from flask_restx import Resource, Namespace, fields
+from src.pipelines.pipelines import prediction
 
 from src.pipelines.utils import predict
 

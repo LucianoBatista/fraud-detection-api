@@ -8,7 +8,7 @@ from src.database.crud import model_crud
 ml_model_namespace = Namespace("Training")
 
 ml_model_schema = ml_model_namespace.model(
-    "ML-Model", {"url": fields.String(required=True)}
+    "ML-Model", {"dataset": fields.String(required=True)}
 )
 
 
@@ -18,10 +18,12 @@ class MlModel(Resource):
     @ml_model_namespace.expect(ml_model_schema, validate=True)
     def post(self):
         content = request.get_json()
-        url = content["url"]
-        task = async_workflow.delay(str(url))
-        print(task)
-        return {"task_id": task.id}, 202
+        dataset_url = content["dataset"]
+        training_model_id = model_crud.queue_model(
+            dataset=dataset_url, status="processing"
+        )
+        _ = async_workflow.delay(str(dataset_url), str(training_model_id))
+        return {"id": training_model_id}, 201
 
 
 class MlModelStatus(Resource):

@@ -116,7 +116,7 @@ class Training:
         self.y_pred_train = self.lrc.predict(self.X_train)
         self.y_pred_test = self.lrc.predict(self.X_test)
 
-    def calculate_metrics(self):
+    def calculate_metrics(self) -> dict:
         # train
         accuracy_training = (accuracy_score(self.y_train, self.y_pred_train),)
         precision_training = precision_score(self.y_train, self.y_pred_train)
@@ -145,3 +145,15 @@ class Training:
         }
 
         return metrics_training
+
+
+def prediction(pickle_model, payload: dict):
+    with open(pickle_model, "rb") as f:
+        lr = pickle.load(f)
+
+    print(lr)
+    payload_df = pd.DataFrame(payload, index=[1])
+    payload_array = np.array(payload_df)
+    print(payload_array)
+    y_pred = lr.predict(payload_array)
+    return y_pred
