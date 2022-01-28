@@ -2,7 +2,14 @@ import pickle
 import pandas as pd
 from pandas import DataFrame, Series
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, roc_auc_score, precision_score, recall_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import (
+    accuracy_score,
+    roc_auc_score,
+    precision_score,
+    recall_score,
+    f1_score,
+)
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from feature_engine.encoding import OneHotEncoder
@@ -42,9 +49,9 @@ class PreProcessingPipe:
     def filter_type_classes(self, classes: list):
         self.dataset = self.dataset[~self.dataset["type"].isin(classes)]
 
-    def train_test_splitting(self, sample_test_size: float):
-        X_dataset = self.dataset.drop(["isFraud"], axis=1)
-        y_target = self.dataset[["isFraud"]]
+    def train_test_splitting(self, sample_test_size: float, to_drop: list):
+        X_dataset = self.dataset.drop(to_drop, axis=1)
+        y_target = self.dataset[to_drop]
 
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
             X_dataset,
@@ -64,7 +71,9 @@ class PreProcessingPipe:
         self.X_train["type"] = le.transform(self.X_train["type"])
         self.X_test["type"] = le.transform(self.X_test["type"])
 
-    def one_hot_encoder(self, cat_variables: list, is_x_test: bool):
+    def one_hot_encoder(
+        self, cat_variables: list, is_x_test: bool, model_name: str = None
+    ):
 
         if not is_x_test:
             ohe = OneHotEncoder(variables=cat_variables)
@@ -73,6 +82,8 @@ class PreProcessingPipe:
             self.X_train = ohe.transform(self.X_train)
             self.X_test = ohe.transform(self.X_test)
 
+            with open(f"src/models/encoder_{model_name}", "wb") as f:
+                pickle.dump(ohe, f)
         else:
             with open("src/models/ohe", "rb") as f:
                 ohe = pickle.load(f)
@@ -117,18 +128,31 @@ class Training:
         self.y_pred_train = self.lrc.predict(self.X_train)
         self.y_pred_test = self.lrc.predict(self.X_test)
 
-    def calculate_metrics(self) -> dict:
+    def fit_random_forest(self):
+        # chute
+        self.rfc = RandomForestClassifier(n_jobs=-1)
+        self.rfc.fit(self.X_train, self.y_train["is_fraud"])
+
+    def predict_random_forest(self):
+        predict_proba_train = self.rfc.predict_proba(self.X_train)
+        predict_proba_test = self.rfc.predict_proba(self.X_test)
+        self.y_pred_train = (predict_proba_train[:, 1] >= 0.5).astype("int")
+        self.y_pred_test = (predict_proba_test[:, 1] >= 0.5).astype("int")
+
+    def calculate_metrics(self):
         # train
-        accuracy_training = (accuracy_score(self.y_train, self.y_pred_train),)
+        accuracy_training = accuracy_score(self.y_train, self.y_pred_train)
         precision_training = precision_score(self.y_train, self.y_pred_train)
         recall_training = recall_score(self.y_train, self.y_pred_train)
         auc_training = roc_auc_score(self.y_train, self.y_pred_train)
+        f1_training = f1_score(self.y_train, self.y_pred_train)
 
         # test
-        accuracy_testing = (accuracy_score(self.y_test, self.y_pred_test),)
+        accuracy_testing = accuracy_score(self.y_test, self.y_pred_test)
         precision_testing = precision_score(self.y_test, self.y_pred_test)
         recall_testing = recall_score(self.y_test, self.y_pred_test)
         auc_testing = roc_auc_score(self.y_test, self.y_pred_test)
+        f1_testing = f1_score(self.y_test, self.y_pred_test)
 
         metrics_training = {
             "training": {
@@ -136,12 +160,14 @@ class Training:
                 "recall": recall_training,
                 "precision": precision_training,
                 "auc": auc_training,
+                "f1": f1_training,
             },
             "testing": {
                 "accuracy": accuracy_testing,
                 "recall": recall_testing,
                 "precision": precision_testing,
                 "auc": auc_testing,
+                "f1": f1_testing,
             },
         }
 

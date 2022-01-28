@@ -9,16 +9,18 @@ import pandas as pd
 def run_pipeline(download_link: str, training_queue_id: int):
     # reading downloaded data
     df = pd.read_csv(download_link)
+    df["day_of_month"] = df["day_of_month"].astype(str)
 
     # preprocessing on the dataset
     pre_processing_pipe = pipelines.PreProcessingPipe(dataset=df)
-    pre_processing_pipe.drop_columns(
-        columns=["isFlaggedFraud", "step", "nameOrig", "nameDest"]
+    pre_processing_pipe.train_test_splitting(
+        sample_test_size=0.40, to_drop=["is_fraud"]
     )
-    pre_processing_pipe.filter_type_classes(classes=["PAYMENT", "CASH_IN", "DEBIT"])
-    pre_processing_pipe.train_test_splitting(sample_test_size=0.40)
-    pre_processing_pipe.label_encoding()
-    pre_processing_pipe.scaling()
+    pre_processing_pipe.one_hot_encoder(
+        ["day_of_month", "type"],
+        is_x_test=False,
+        model_name="ohe",
+    )
 
     # training
     training_pipe = pipelines.Training(
@@ -27,8 +29,8 @@ def run_pipeline(download_link: str, training_queue_id: int):
         y_train=pre_processing_pipe.y_train,
         y_test=pre_processing_pipe.y_test,
     )
-    training_pipe.fit_logistic_regression()
-    training_pipe.predict_logistic_regression()
+    training_pipe.fit_random_forest()
+    training_pipe.predict_random_forest()
     metrics = training_pipe.calculate_metrics()
 
     # comparing the models
@@ -44,13 +46,13 @@ def run_pipeline(download_link: str, training_queue_id: int):
         # model to add
         model = {
             "modelname": f"model_{training_queue_id}",
-            "accuracy": metrics.get("accuracy"),
-            "recall": metrics.get("recall"),
-            "precision": metrics.get("precision"),
-            "f1": metrics.get("f1"),
+            "accuracy": metrics.get("testing").get("accuracy"),
+            "recall": metrics.get("testing").get("recall"),
+            "precision": metrics.get("testing").get("precision"),
+            "f1": metrics.get("testing").get("f1"),
             "time": 12,
-            "auc": 123,
+            "auc": metrics.get("testing").get("auc"),
+            "enabled": True,
         }
 
-        model_crud.add_new_model(model)
-        # update queued model
+        model_crud.add_model(model)

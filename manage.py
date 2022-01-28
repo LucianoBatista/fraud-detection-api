@@ -28,7 +28,7 @@ def seed_db():
             auc=0.541,
             f1=0.153,
             time=26.77,
-            enabled=1,
+            enabled=True,
         )
     )
     db.session.commit()

@@ -23,13 +23,13 @@ def add_model(model: Model):
     db.session.add(
         Model(
             modelname="other_model.sav",
-            precision=model.precision,
-            recall=model.recall,
-            accuracy=model.accuracy,
-            auc=model.auc,
-            f1=model.f1,
-            time=model.time,
-            enabled=model.enabled,
+            precision=model.get("precision"),
+            recall=model.get("recall"),
+            accuracy=model.get("accuracy"),
+            auc=model.get("auc"),
+            f1=model.get("f1"),
+            time=model.get("time"),
+            enabled=model.get("enabled"),
         )
     )
     db.session.commit()
