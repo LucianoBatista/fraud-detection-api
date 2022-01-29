@@ -8,7 +8,7 @@ done
 
 echo "PostgreSQL started"
 
-if [ "${APP_NAME}" = 'worker' ]; then
+if [ "${DYNO}" = 'worker' ]; then
     echo 'Starting Worker'
 
     celery \

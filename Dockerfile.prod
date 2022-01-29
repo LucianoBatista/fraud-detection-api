@@ -1,0 +1,27 @@
+FROM python:3.9.5-slim-buster
+
+WORKDIR /usr/src/app
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV FLASK_ENV production 
+ENV APP_SETTINGS src.config.ProductionConfig
+
+
+RUN apt-get update \
+    && apt-get -y install netcat gcc postgresql \
+    && apt-get clean
+
+COPY Pipfile* ./
+
+RUN pip3 install -q --no-cache-dir \
+    pipenv==2022.1.8 && \ 
+    pipenv install --system --dev
+
+COPY . .
+COPY ./entrypoint.sh .
+
+RUN adduser --disable-password myuser
+USER myuser
+
+ENTRYPOINT ["/usr/src/app/entrypoint_prod.sh"]
