@@ -26,6 +26,6 @@ else
     python manage.py seed_model
     python manage.py seed_predict
     python manage.py seed_training
-    gunicorn --bind 0.0.0.0:$PORT manage:app
+    python manage.py run -h 0.0.0.0 
 
 fi

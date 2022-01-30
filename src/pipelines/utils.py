@@ -23,4 +23,6 @@ def predict(data):
 
     y_hat_predict = model.predict(x_test)
 
+    # db_interaction
+
     return y_hat_predict

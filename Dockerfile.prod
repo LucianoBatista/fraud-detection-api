@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV FLASK_ENV production 
 ENV APP_SETTINGS src.config.ProductionConfig
-
+ENV FLASK_APP src/__init__.py
 
 RUN apt-get update \
     && apt-get -y install netcat gcc postgresql \
@@ -21,7 +21,7 @@ RUN pip3 install -q --no-cache-dir \
 COPY . .
 COPY ./entrypoint.sh .
 
-RUN adduser --disable-password myuser
+RUN adduser --disabled-password myuser
 USER myuser
 
-ENTRYPOINT ["/usr/src/app/entrypoint_prod.sh"]
+CMD gunicorn --bind 0.0.0.0:$PORT manage:app

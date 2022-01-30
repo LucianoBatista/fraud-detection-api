@@ -22,12 +22,12 @@ def seed_db():
     db.session.add(
         Model(
             modelname="lrc_baseline.sav",
-            precision=0.964,
-            recall=0.082,
-            accuracy=0.997,
-            auc=0.541,
-            f1=0.153,
-            time=26.77,
+            precision=0.696,
+            recall=0.676,
+            accuracy=0.999,
+            auc=0.838,
+            f1=0.686,
+            time=252.80,
             enabled=True,
         )
     )
